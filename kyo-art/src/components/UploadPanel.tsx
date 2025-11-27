@@ -148,7 +148,15 @@ export function UploadPanel() {
         {statuses.map((s, idx) => {
           const completedIndex = statuses.findIndex((v) => v === step);
           const isComplete = completedIndex >= 0 && idx <= completedIndex;
-          const chipLabel = isComplete ? s : ("Processing…" as Step);
+          const chipLabel =
+            (isComplete ? s : "Processing…") as
+              | "Image Uploaded"
+              | "Details Saved"
+              | "Verified"
+              | "IP Registered"
+              | "NFT Minted"
+              | "Needs Review"
+              | "Processing…";
           return <StatusChip key={s} label={chipLabel} />;
         })}
       </div>
