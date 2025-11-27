@@ -49,7 +49,7 @@ export async function uploadBufferToPinata(
 ): Promise<PinataUploadResult> {
   const jwt = requireEnv("PINATA_JWT");
   const gateway = process.env.PINATA_GATEWAY_URL ?? "https://gateway.pinata.cloud/ipfs/";
-  const blob = buffer instanceof Buffer ? new Blob([buffer]) : new Blob([buffer]);
+  const blob = new Blob([new Uint8Array(buffer)]);
   const formData = new FormData();
   formData.append("file", blob, filename);
 
