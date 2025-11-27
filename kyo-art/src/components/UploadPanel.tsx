@@ -148,8 +148,8 @@ export function UploadPanel() {
         {statuses.map((s, idx) => {
           const completedIndex = statuses.findIndex((v) => v === step);
           const isComplete = completedIndex >= 0 && idx <= completedIndex;
-          const label: Step = isComplete ? s : "Processing…";
-          return <StatusChip key={s} label={label} />;
+          const chipLabel = isComplete ? s : ("Processing…" as Step);
+          return <StatusChip key={s} label={chipLabel} />;
         })}
       </div>
       {message && <p className="artwork-meta">{message}</p>}
