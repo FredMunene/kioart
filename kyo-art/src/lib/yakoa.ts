@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 type VerificationResult = {
   status: "Verified" | "Needs Review";
   score?: number;
@@ -18,14 +20,23 @@ function mapStatus(raw?: string): "Verified" | "Needs Review" {
   return POSITIVE_STATUSES.includes(normalized) ? "Verified" : "Needs Review";
 }
 
+function toHexId(seed: string): string {
+  const hex = createHash("sha256").update(seed).digest("hex");
+  return `0x${hex.slice(0, 40)}`;
+}
+
 /**
  * Register media with Yakoa and return token info.
  * Expects YAKOA_API_URL (e.g., https://docs-demo.ip-api-sandbox.yakoa.io/docs-demo) and YAKOA_API_KEY in env.
  * Uses POST /token as per sandbox docs.
  */
-export async function registerWithYakoa(id: string, mediaUrl: string): Promise<VerificationResult> {
+export async function registerWithYakoa(id: string, mediaUrl: string, title?: string): Promise<VerificationResult> {
   const baseUrl = process.env.YAKOA_API_URL ?? "https://docs-demo.ip-api-sandbox.yakoa.io/docs-demo";
   const apiKey = requireEnv("YAKOA_API_KEY");
+  const tokenId = toHexId(id);
+  const creatorId = process.env.YAKOA_CREATOR_ID ?? tokenId;
+  const nowIso = new Date().toISOString();
+  const mintTxHash = toHexId(id + "-tx");
 
   const res = await fetch(`${baseUrl}/token`, {
     method: "POST",
@@ -34,7 +45,16 @@ export async function registerWithYakoa(id: string, mediaUrl: string): Promise<V
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      id,
+      id: tokenId,
+      mint_tx: {
+        hash: mintTxHash,
+        block_number: 0,
+        timestamp: nowIso
+      },
+      creator_id: creatorId,
+      metadata: {
+        name: title ?? "Untitled"
+      },
       media: [
         {
           media_id: "primary",

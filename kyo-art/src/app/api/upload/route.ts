@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
     // Run Yakoa verification (optional if env missing)
     try {
-      verification = await registerWithYakoa(pin.cid, pin.uri);
+      verification = await registerWithYakoa(pin.cid, pin.uri, title);
     } catch (err) {
       console.warn("Yakoa verification skipped/failed:", err);
     }
