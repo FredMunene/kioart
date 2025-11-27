@@ -20,20 +20,27 @@ function mapStatus(raw?: string): "Verified" | "Needs Review" {
 
 /**
  * Register media with Yakoa and return token info.
- * Expects YAKOA_API_URL (defaults to demo/prod base) and YAKOA_API_KEY in env.
+ * Expects YAKOA_API_URL (e.g., https://docs-demo.ip-api-sandbox.yakoa.io/docs-demo) and YAKOA_API_KEY in env.
+ * Uses POST /token as per sandbox docs.
  */
-export async function registerWithYakoa(imageUrl: string): Promise<VerificationResult> {
-  const baseUrl = process.env.YAKOA_API_URL ?? "https://api.yakoa.io";
+export async function registerWithYakoa(id: string, mediaUrl: string): Promise<VerificationResult> {
+  const baseUrl = process.env.YAKOA_API_URL ?? "https://docs-demo.ip-api-sandbox.yakoa.io/docs-demo";
   const apiKey = requireEnv("YAKOA_API_KEY");
 
-  const res = await fetch(`${baseUrl}/tokens`, {
+  const res = await fetch(`${baseUrl}/token`, {
     method: "POST",
     headers: {
       "X-API-Key": apiKey,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      media_url: imageUrl
+      id,
+      media: [
+        {
+          media_id: "primary",
+          url: mediaUrl
+        }
+      ]
     })
   });
 
@@ -54,10 +61,10 @@ export async function registerWithYakoa(imageUrl: string): Promise<VerificationR
  * Fetch an existing Yakoa token to refresh status/score.
  */
 export async function getYakoaToken(tokenId: string): Promise<VerificationResult> {
-  const baseUrl = process.env.YAKOA_API_URL ?? "https://api.yakoa.io";
+  const baseUrl = process.env.YAKOA_API_URL ?? "https://docs-demo.ip-api-sandbox.yakoa.io/docs-demo";
   const apiKey = requireEnv("YAKOA_API_KEY");
 
-  const res = await fetch(`${baseUrl}/tokens/${tokenId}`, {
+  const res = await fetch(`${baseUrl}/token/${tokenId}`, {
     headers: {
       "X-API-Key": apiKey
     }
