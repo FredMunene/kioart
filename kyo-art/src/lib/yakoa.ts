@@ -1,6 +1,7 @@
 type VerificationResult = {
   status: "Verified" | "Needs Review";
   score?: number;
+  tokenId?: string;
 };
 
 function requireEnv(name: string): string {
@@ -9,35 +10,68 @@ function requireEnv(name: string): string {
   return val;
 }
 
+const POSITIVE_STATUSES = ["authorized", "original", "high_originality", "high-originality"];
+
+function mapStatus(raw?: string): "Verified" | "Needs Review" {
+  if (!raw) return "Needs Review";
+  const normalized = raw.toLowerCase();
+  return POSITIVE_STATUSES.includes(normalized) ? "Verified" : "Needs Review";
+}
+
 /**
- * Verify an image with Yakoa. Adjust endpoint/payload per Yakoa docs.
- * Expects YAKOA_API_URL and YAKOA_API_KEY in env.
+ * Register media with Yakoa and return token info.
+ * Expects YAKOA_API_URL (defaults to demo/prod base) and YAKOA_API_KEY in env.
  */
-export async function verifyWithYakoa(imageUrl: string): Promise<VerificationResult> {
-  const baseUrl = requireEnv("YAKOA_API_URL");
+export async function registerWithYakoa(imageUrl: string): Promise<VerificationResult> {
+  const baseUrl = process.env.YAKOA_API_URL ?? "https://api.yakoa.io";
   const apiKey = requireEnv("YAKOA_API_KEY");
 
-  const res = await fetch(`${baseUrl}/verify`, {
+  const res = await fetch(`${baseUrl}/tokens`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      "X-API-Key": apiKey,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ url: imageUrl })
+    body: JSON.stringify({
+      media_url: imageUrl
+    })
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Yakoa verification failed: ${res.status} ${res.statusText} ${text}`);
+    throw new Error(`Yakoa token registration failed: ${res.status} ${res.statusText} ${text}`);
   }
 
-  const data = (await res.json()) as { score?: number; status?: string };
-  const status = (data.status === "Verified" ? "Verified" : "Needs Review") as
-    | "Verified"
-    | "Needs Review";
-
+  const data = (await res.json()) as { id?: string; status?: string; score?: number };
   return {
-    status,
-    score: data.score
+    status: mapStatus(data.status),
+    score: data.score,
+    tokenId: data.id
+  };
+}
+
+/**
+ * Fetch an existing Yakoa token to refresh status/score.
+ */
+export async function getYakoaToken(tokenId: string): Promise<VerificationResult> {
+  const baseUrl = process.env.YAKOA_API_URL ?? "https://api.yakoa.io";
+  const apiKey = requireEnv("YAKOA_API_KEY");
+
+  const res = await fetch(`${baseUrl}/tokens/${tokenId}`, {
+    headers: {
+      "X-API-Key": apiKey
+    }
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Yakoa token fetch failed: ${res.status} ${res.statusText} ${text}`);
+  }
+
+  const data = (await res.json()) as { id?: string; status?: string; score?: number };
+  return {
+    status: mapStatus(data.status),
+    score: data.score,
+    tokenId: data.id
   };
 }
