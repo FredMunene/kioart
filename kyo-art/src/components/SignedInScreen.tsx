@@ -85,13 +85,16 @@ export default function SignedInScreen() {
             <UserBalance balance={formattedBalance} />
           </div>
           <div className="card card--transaction">
-            {isSignedIn && (
+            {isSignedIn && evmAddress && (
               <FundWallet
                 onSuccess={getBalance}
                 network="base"
                 cryptoCurrency="eth"
                 destinationAddress={evmAddress}
               />
+            )}
+            {isSignedIn && !evmAddress && (
+              <p className="artwork-meta">Wallet is initializing…</p>
             )}
           </div>
         </div>
