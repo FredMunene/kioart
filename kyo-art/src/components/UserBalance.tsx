@@ -1,0 +1,45 @@
+"use client";
+import { LoadingSkeleton } from "@coinbase/cdp-react/components/ui/LoadingSkeleton";
+
+interface Props {
+  balance?: string;
+  faucetUrl?: string;
+  faucetName?: string;
+}
+
+/**
+ * A component that displays the user's balance.
+ *
+ * @param {Props} props - The props for the UserBalance component.
+ * @param {string} [props.balance] - The user's balance.
+ * @returns A component that displays the user's balance.
+ */
+export default function UserBalance(props: Props) {
+  const { balance, faucetUrl, faucetName } = props;
+
+  return (
+    <>
+      <h2 className="card-title">Available balance</h2>
+      <p className="user-balance flex-col-container flex-grow">
+        {balance === undefined && <LoadingSkeleton as="span" className="loading--balance" />}
+        {balance !== undefined && (
+          <span className="flex-row-container" style={{ gap: "8px" }}>
+            <span className="balance-icon" aria-hidden="true">
+              Ξ
+            </span>
+            <span>{balance}</span>
+            <span className="sr-only">Ethereum</span>
+          </span>
+        )}
+      </p>
+      {faucetUrl && faucetName && (
+        <p>
+          Get testnet ETH from{" "}
+          <a href={faucetUrl} target="_blank" rel="noopener noreferrer">
+            {faucetName}
+          </a>
+        </p>
+      )}
+    </>
+  );
+}
