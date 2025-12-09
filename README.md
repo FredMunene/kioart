@@ -8,6 +8,7 @@
 
 ### Core flows
 - Artist: connect wallet → upload → Pinata/IPFS → Yakoa token check → Story IP registration → list with provenance chips (Verified / IP Registered / NFT Minted).
+- Upload API (`/api/upload`) details: accepts image + metadata, pins to Pinata/IPFS, runs Yakoa originality check (sandbox) and stores status/score, registers IP on Story (Aeneid) and saves the IP ID, then inserts a Supabase row with CID, URI, Yakoa status/score, Story IP ID, USDC price (6 decimals), payout wallet (from embedded CDP), sale type metadata; duplicate CIDs return 409 to block reuploads; failures in Yakoa/Story are caught and logged so the core upload still completes.
 - Buyer: browse → see provenance → buy/bid; org badges/storage notes.
 
 ### Why this matters

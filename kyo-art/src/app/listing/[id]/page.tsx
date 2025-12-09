@@ -133,12 +133,12 @@ function ListingClient() {
       return;
     }
     try {
-      const bal = await publicClient.readContract({
+      const bal = (await publicClient.readContract({
         address: USDC_BASE,
         abi: USDC_ABI,
         functionName: "balanceOf",
         args: [evmAddress]
-      } as any);
+      })) as bigint;
       setUsdcBalance(BigInt(bal));
     } catch (err) {
       console.warn("Failed to fetch USDC balance; defaulting to 0", err);
