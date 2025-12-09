@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 type StoryRegistrationResult = {
   ipId: string;
 };
@@ -8,9 +10,13 @@ function requireEnv(name: string): string {
   return val;
 }
 
+function sanitizePrivateKey(pk: string): `0x${string}` {
+  return pk.startsWith("0x") ? (pk as `0x${string}`) : (`0x${pk}` as `0x${string}`);
+}
+
 /**
- * Register IP with Story Protocol. Adjust endpoint/payload per Story docs.
- * Expects STORY_API_URL (default: https://api.storyapis.com) and STORY_API_KEY in env.
+ * Register IP with Story Protocol using the core SDK.
+ * Requires WALLET_PRIVATE_KEY; optionally STORY_NETWORK, RPC_PROVIDER_URL, SPG_NFT_CONTRACT_ADDRESS.
  */
 export async function registerStoryIP(payload: {
   title: string;
@@ -18,30 +24,51 @@ export async function registerStoryIP(payload: {
   uri: string;
   artist?: string;
 }): Promise<StoryRegistrationResult> {
-  const baseUrl = process.env.STORY_API_URL ?? "https://api.storyapis.com";
-  const apiKey = requireEnv("STORY_API_KEY");
-
-  const res = await fetch(`${baseUrl}/api/v4/ip-assets`, {
-    method: "POST",
-    headers: {
-      "X-API-Key": apiKey,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      title: payload.title,
-      description: payload.description,
-      asset_uri: payload.uri,
-      artist: payload.artist
-    })
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Story registration failed: ${res.status} ${res.statusText} ${text}`);
+  const pk = process.env.WALLET_PRIVATE_KEY;
+  if (!pk) {
+    throw new Error("Missing WALLET_PRIVATE_KEY for Story registration");
   }
 
-  const data = (await res.json()) as { id?: string; ipId?: string };
-  const ipId = data.ipId || data.id;
+  const { StoryClient, AeneidNetwork } = await import("@story-protocol/core-sdk");
+  const { privateKeyToAccount } = await import("viem/accounts");
+  const { http, createWalletClient } = await import("viem");
+
+  const network = process.env.STORY_NETWORK ?? "aeneid";
+  const rpc = process.env.RPC_PROVIDER_URL ?? "https://rpc.storyprotocol.net";
+  const account = privateKeyToAccount(sanitizePrivateKey(pk));
+  const transport = http(rpc);
+
+  // Only aeneid network is mapped here; extend if needed.
+  const storyNetwork = AeneidNetwork;
+
+  const client = await StoryClient.newClient({
+    network: storyNetwork as any,
+    account,
+    transport
+  } as any);
+
+  // Minimal metadata: we reuse the pinned media URI as both IP and NFT metadata URI.
+  const ipMetadataURI = payload.uri;
+  const nftMetadataURI = payload.uri;
+  const ipMetadataHash = `0x${createHash("sha256").update(payload.uri).digest("hex")}`;
+  const nftMetadataHash = ipMetadataHash;
+
+  const spgNftContract = process.env.SPG_NFT_CONTRACT_ADDRESS;
+
+  const response = await (client as any).ipAsset.registerIpAsset({
+    nft: {
+      type: "mint",
+      spgNftContract
+    },
+    ipMetadata: {
+      ipMetadataURI,
+      ipMetadataHash,
+      nftMetadataURI,
+      nftMetadataHash
+    }
+  });
+
+  const ipId = response?.ipId || response?.txHash;
   if (!ipId) {
     throw new Error("Story registration did not return an IP id");
   }

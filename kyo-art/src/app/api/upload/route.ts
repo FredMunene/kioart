@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { uploadToPinata } from "@/lib/pinata";
 import { getServiceSupabaseClient } from "@/lib/supabase";
-import { verifyWithYakoa } from "@/lib/yakoa";
+import { registerWithYakoa } from "@/lib/yakoa";
 import { registerStoryIP } from "@/lib/story";
 
 export async function POST(req: Request) {
@@ -22,13 +22,14 @@ export async function POST(req: Request) {
       | {
           status: "Verified" | "Needs Review";
           score?: number;
+          tokenId?: string;
         }
       | undefined;
     let story: { ipId: string } | undefined;
 
     // Run Yakoa verification (optional if env missing)
     try {
-      verification = await verifyWithYakoa(pin.uri);
+      verification = await registerWithYakoa(pin.cid, pin.uri, title);
     } catch (err) {
       console.warn("Yakoa verification skipped/failed:", err);
     }
@@ -53,6 +54,7 @@ export async function POST(req: Request) {
           artist_id: artistId,
           yakoa_status: verification?.status,
           yakoa_score: verification?.score,
+          yakoa_token_id: verification?.tokenId,
           story_ip_id: story?.ipId
         })
         .select()

@@ -1,5 +1,7 @@
 ## kyo-art – IP-first art marketplace (hackathon scope)
 
+[live website link](https://kyoart.vercel.app/)
+
 ### What we’re building
 - Provenance-first marketplace for African artists: upload once, verify, register IP, and list (fixed/auction) with clear rights and payouts.
 - Integrations required by tracks: Coinbase CDP (embedded wallets), Story (IP registration), Yakoa (authenticity), Pinata/IPFS (storage), Supabase (data).
