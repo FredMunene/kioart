@@ -29,23 +29,29 @@ export async function registerStoryIP(payload: {
     throw new Error("Missing WALLET_PRIVATE_KEY for Story registration");
   }
 
-  const { StoryClient, AeneidNetwork } = await import("@story-protocol/core-sdk");
+  const { StoryClient, aeneid } = await import("@story-protocol/core-sdk");
   const { privateKeyToAccount } = await import("viem/accounts");
   const { http, createWalletClient } = await import("viem");
 
-  const network = process.env.STORY_NETWORK ?? "aeneid";
-  const rpc = process.env.RPC_PROVIDER_URL ?? "https://rpc.storyprotocol.net";
+  const chainId = (process.env.STORY_NETWORK as "aeneid" | undefined) ?? "aeneid";
+  const rpc =
+    process.env.RPC_PROVIDER_URL ??
+    (aeneid?.rpcUrls?.default?.http?.[0] as string | undefined) ??
+    "https://aeneid.storyrpc.io/";
   const account = privateKeyToAccount(sanitizePrivateKey(pk));
   const transport = http(rpc);
 
-  // Only aeneid network is mapped here; extend if needed.
-  const storyNetwork = AeneidNetwork;
-
-  const client = await StoryClient.newClient({
-    network: storyNetwork as any,
+  const walletClient = createWalletClient({
     account,
     transport
   } as any);
+
+  const client = await StoryClient.newClient({
+    chainId,
+    wallet: walletClient,
+    account,
+    transport
+  });
 
   // Minimal metadata: we reuse the pinned media URI as both IP and NFT metadata URI.
   const ipMetadataURI = payload.uri;

@@ -23,6 +23,13 @@ function DashboardShell() {
   const [drafts, setDrafts] = useState<DashboardItem[]>([]);
   const [live, setLive] = useState<DashboardItem[]>([]);
 
+  const mapStatus = (row: { yakoa_status?: string; story_ip_id?: string }): ProvenanceStatus[] => {
+    const statuses: ProvenanceStatus[] = [];
+    if (row.yakoa_status === "Verified") statuses.push("Verified");
+    if (row.story_ip_id) statuses.push("IP Registered");
+    return statuses;
+  };
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -46,13 +53,6 @@ function DashboardShell() {
     };
     if (isSignedIn) load();
   }, [isSignedIn]);
-
-  const mapStatus = (row: { yakoa_status?: string; story_ip_id?: string }): ProvenanceStatus[] => {
-    const statuses: ProvenanceStatus[] = [];
-    if (row.yakoa_status === "Verified") statuses.push("Verified");
-    if (row.story_ip_id) statuses.push("IP Registered");
-    return statuses;
-  };
 
   return (
     <>

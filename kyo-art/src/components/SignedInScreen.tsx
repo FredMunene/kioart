@@ -53,12 +53,20 @@ const useEvmBalance = (
   }, [address, client]);
 
   useEffect(() => {
-    if (!poll) {
-      getBalance();
-      return;
-    }
-    const interval = setInterval(getBalance, 500);
-    return () => clearInterval(interval);
+    let active = true;
+    const tick = async () => {
+      if (!active) return;
+      await getBalance();
+    };
+
+    void tick();
+    if (!poll) return () => { active = false; };
+
+    const interval = setInterval(tick, 500);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [getBalance, poll]);
 
   return { balance, formattedBalance, getBalance };
