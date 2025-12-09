@@ -1,6 +1,24 @@
-# CDP React App
+## kyo-art – IP-first art marketplace
+
+A provenance-first marketplace for African artists. The platform allows artists to upload their work, verify its authenticity, register intellectual property (IP), and list it for sale (fixed price or auction) with clear rights and payout structures.
+
+### Tech Stack
+
+This project leverages a modern web3 stack, including:
+- **Frontend:** [Next.js](https://nextjs.org/) (React Framework)
+- **Wallet Integration:** [Coinbase CDP](https://docs.cloud.coinbase.com/cdp/docs) for embedded wallets, simplifying user onboarding.
+- **On-chain IP:** [Story Protocol](https://storyprotocol.xyz/) for on-chain IP registration and management.
+- **Authenticity:** [Yakoa](https://www.yakoa.com/) to ensure the authenticity of the artwork.
+- **Decentralized Storage:** [Pinata](https://www.pinata.cloud/)/[IPFS](https://ipfs.tech/) for decentralized and permanent file storage.
+- **Backend & Database:** [Supabase](https://supabase.com/) for data management.
+- **Blockchain Interaction:** [Viem](https://viem.sh/) for type-safe Ethereum interactions.
 
 This project was generated with [`@coinbase/create-cdp-app`](https://coinbase.github.io/cdp-web/modules/_coinbase_create-cdp-app.html) using the Next.js template.
+
+### Core Workflows
+
+*   **For Artists:** Connect wallet → Upload artwork → Pin to Pinata/IPFS → Verify with Yakoa → Register IP with Story Protocol → List for sale with clear provenance.
+*   **For Buyers:** Browse the marketplace → View detailed provenance information → Purchase or bid on artwork.
 
 ## Project Structure
 
@@ -46,17 +64,13 @@ First, make sure you have your CDP Project ID:
 
 Then, copy the `env.example` file to `.env`, and populate the `NEXT_PUBLIC_CDP_PROJECT_ID` with your project id.
 
-### CDP API credentials (Optional)
+### Environment Variables
 
-If you enabled Onramp during setup, your `.env` file will already contain the CDP API credentials. If you want to add Onramp later:
-
-1. Go to [CDP API Keys](https://portal.cdp.coinbase.com/api-keys) to create an API key
-2. Add the following to your `.env` file:
-   ```
-   CDP_API_KEY_ID=your-api-key-id
-   CDP_API_KEY_SECRET=your-api-key-secret
-   ```
-
+This project requires several environment variables to be set up for full functionality. Copy the `env.example` to `.env` and fill in the following values:
+- `NEXT_PUBLIC_CDP_PROJECT_ID`: Your project ID from the Coinbase CDP Portal.
+- `SUPABASE_URL`: Your Supabase project URL.
+- `SUPABASE_ANON_KEY`: Your Supabase anonymous key.
+- `PINATA_JWT`: Your JWT from Pinata for authenticating uploads.
 
 Now you can start the development server:
 
@@ -88,17 +102,6 @@ pnpm dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to see your app.
-
-### Supabase + IPFS (Pinata)
-
-This project now includes:
-- Supabase client setup (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` envs).
-- Pinata upload helper (`PINATA_JWT`, optional `PINATA_GATEWAY_URL`).
-- API route `POST /api/upload` accepting multipart form-data `{ file, title?, description?, artistId? }`:
-  - Pins the file to Pinata.
-  - Inserts a row into the `artworks` table (expects columns: `title`, `description`, `cid`, `uri`, `artist_id`).
-  - Returns `{ cid, uri, record }`.
-Whitelist your local origin in CDP Portal and add your ngrok URL if tunneling.
 
 ## Features
 
