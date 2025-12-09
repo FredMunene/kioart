@@ -19,6 +19,8 @@ const solanaAccountType = process.env.NEXT_PUBLIC_CDP_CREATE_SOLANA_ACCOUNT
   ? process.env.NEXT_PUBLIC_CDP_CREATE_SOLANA_ACCOUNT === "true"
   : false;
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
 const CDP_CONFIG = {
   projectId: process.env.NEXT_PUBLIC_CDP_PROJECT_ID ?? "",
   ...(ethereumAccountType && {
@@ -32,7 +34,7 @@ const CDP_CONFIG = {
     },
   }),
   appName: "kyo-art",
-  appLogoUrl: "http://localhost:3000/logo.svg",
+  appLogoUrl: `${appUrl}/kioart.png`,
   authMethods: ["email", "sms", "oauth:google", "oauth:apple"],
 } as Config;
 
