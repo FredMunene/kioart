@@ -11,6 +11,7 @@ import { useIsSignedIn, useSendEvmTransaction, useEvmAddress } from "@coinbase/c
 import { createPublicClient, http, encodeFunctionData } from "viem";
 import { base } from "viem/chains";
 import FundWallet from "@/components/FundWallet";
+import { ipfsToHttp } from "@/lib/ipfs";
 
 type Listing = {
   id: string;
@@ -219,7 +220,7 @@ function ListingClient() {
             className="artwork-thumb"
             style={{
               aspectRatio: "1",
-              backgroundImage: `url(${listing.uri})`,
+              backgroundImage: `url(${ipfsToHttp(listing.uri)})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",

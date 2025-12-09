@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { StatusChip } from "./StatusChip";
+import { ipfsToHttp } from "@/lib/ipfs";
 
 export type ProvenanceStatus = "Verified" | "IP Registered" | "NFT Minted";
 export type BadgeStatus =
@@ -39,12 +40,14 @@ export function ArtworkCard({
   image,
   href
 }: ArtworkCardProps) {
+  const imageUrl = image ? ipfsToHttp(image) : undefined;
+
   const content = (
     <div className="card artwork-card">
       <div
         className="artwork-thumb"
         style={{
-          backgroundImage: image ? `url(${image})` : undefined,
+          backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat"
