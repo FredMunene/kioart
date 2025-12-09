@@ -190,7 +190,8 @@ function ListingClient() {
           chainId: 8453,
           type: "eip1559"
         },
-        network: "base"
+        network: "base",
+        evmAccount: evmAddress as `0x${string}`
       });
       await refreshBalance();
       setPaymentStatus("success");
