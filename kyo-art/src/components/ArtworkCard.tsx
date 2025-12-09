@@ -66,13 +66,15 @@ export function ArtworkCard({
         </div>
         {storyIpId && (
           <p className="artwork-meta" style={{ marginTop: 8 }}>
+            IP confirmed:{" "}
             <a
-              href={`https://explorer.story.foundation/ipa/${storyIpId}`}
+              href={`https://aeneid.explorer.story.foundation/ipa/${storyIpId}`}
               target="_blank"
               rel="noreferrer"
               style={{ textDecoration: "underline" }}
+              onClick={(e) => e.stopPropagation()}
             >
-              IP confirmed
+              view
             </a>
           </p>
         )}

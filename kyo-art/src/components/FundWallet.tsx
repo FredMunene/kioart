@@ -46,15 +46,7 @@ export default function FundWallet({
         onSuccess={onSuccess}
         destinationAddress={destinationAddress}
       />
-      <p className="small-text">
-        Warning: this will cost real money unless you{" "}
-        <a
-          href="https://docs.cdp.coinbase.com/onramp-&-offramp/developer-guidance/faq#can-i-test-my-onramp-integration-by-creating-mock-buys-and-sends%3F"
-          target="_blank"
-        >
-          enable mock buys and sends
-        </a>
-      </p>
+      <p className="small-text">Warning: This will transact real money.</p>
     </>
   );
 }

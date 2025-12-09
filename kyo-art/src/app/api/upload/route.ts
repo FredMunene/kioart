@@ -11,6 +11,9 @@ export async function POST(req: Request) {
     const title = formData.get("title")?.toString() ?? "Untitled";
     const description = formData.get("description")?.toString() ?? "";
     const artistId = formData.get("artistId")?.toString() ?? null;
+    const payoutAddress = formData.get("payoutAddress")?.toString() ?? null;
+    const priceWei = formData.get("priceWei")?.toString() ?? null;
+    const saleType = formData.get("saleType")?.toString() ?? null;
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "file is required" }, { status: 400 });
@@ -55,7 +58,13 @@ export async function POST(req: Request) {
           yakoa_status: verification?.status,
           yakoa_score: verification?.score,
           yakoa_token_id: verification?.tokenId,
-          story_ip_id: story?.ipId
+          story_ip_id: story?.ipId,
+          price_wei: priceWei,
+          network: "base",
+          metadata: {
+            sale_type: saleType,
+            payout_address: payoutAddress
+          }
         })
         .select()
         .single();

@@ -20,9 +20,10 @@ function mapStatus(raw?: string): "Verified" | "Needs Review" {
   return POSITIVE_STATUSES.includes(normalized) ? "Verified" : "Needs Review";
 }
 
-function toHexId(seed: string): string {
+function toHexId(seed: string, full = false): string {
   const hex = createHash("sha256").update(seed).digest("hex");
-  return `0x${hex.slice(0, 40)}`;
+  if (full) return `0x${hex}`; // 32-byte (64 hex chars) hash for tx ids
+  return `0x${hex.slice(0, 40)}`; // shorter id to satisfy token id pattern
 }
 
 /**
@@ -36,7 +37,7 @@ export async function registerWithYakoa(id: string, mediaUrl: string, title?: st
   const tokenId = toHexId(id);
   const creatorId = process.env.YAKOA_CREATOR_ID ?? tokenId;
   const nowIso = new Date().toISOString();
-  const mintTxHash = toHexId(id + "-tx");
+  const mintTxHash = toHexId(id + "-tx", true);
 
   const res = await fetch(`${baseUrl}/token`, {
     method: "POST",

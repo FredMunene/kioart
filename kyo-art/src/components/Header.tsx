@@ -4,6 +4,7 @@ import { AuthButton } from "@coinbase/cdp-react/components/AuthButton";
 import { useEffect, useState } from "react";
 
 import { IconCheck, IconCopy, IconUser } from "@/components/Icons";
+import Image from "next/image";
 
 /**
  * Header component
@@ -34,7 +35,15 @@ export default function Header() {
     <header>
       <div className="header-inner">
         <div className="title-container">
-          <h1 className="site-title">CDP Next.js StarterKit</h1>
+          <Image
+            src="/kioart-white.png"
+            alt="kyo-art logo"
+            className="site-logo site-logo--circle"
+            width={40}
+            height={40}
+            priority
+          />
+          <h1 className="site-title">kyo-art</h1>
           <span className="smart-badge">SMART</span>
         </div>
         <div className="user-info flex-row-container">

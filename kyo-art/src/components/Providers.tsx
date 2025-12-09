@@ -34,7 +34,7 @@ const CDP_CONFIG = {
     },
   }),
   appName: "kyo-art",
-  appLogoUrl: `${appUrl}/kioart.png`,
+  appLogoUrl: `${appUrl}/kioart-white.png`,
   authMethods: ["email", "sms", "oauth:google", "oauth:apple"],
 } as Config;
 

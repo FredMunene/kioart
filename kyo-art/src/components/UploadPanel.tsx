@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useEvmAddress } from "@coinbase/cdp-hooks";
+import { useRouter } from "next/navigation";
 import { StatusChip } from "./StatusChip";
 
 type Step =
@@ -23,6 +25,8 @@ export function UploadPanel() {
   const [step, setStep] = useState<Step>("Idle");
   const [message, setMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const { evmAddress } = useEvmAddress();
+  const router = useRouter();
 
   const statuses: Step[] = [
     "Image Uploaded",
@@ -53,6 +57,21 @@ export function UploadPanel() {
       formData.append("file", file);
       formData.append("title", title);
       formData.append("description", description);
+      formData.append("saleType", saleType);
+
+      if (price) {
+        const parsed = Number(price);
+        if (!Number.isNaN(parsed) && parsed > 0) {
+          // Treat input as USDC (6 decimals)
+          const usdcUnits = BigInt(Math.round(parsed * 1e6));
+          formData.append("priceWei", usdcUnits.toString());
+        }
+      }
+      if (evmAddress) {
+        formData.append("payoutAddress", evmAddress);
+      }
+
+      console.log(evmAddress)
       // Optional: org/artist fields could be added here.
 
       const res = await fetch("/api/upload", {
@@ -63,6 +82,14 @@ export function UploadPanel() {
       if (!res.ok) {
         throw new Error("Upload failed");
       }
+
+      setFile(null);
+      setTitle("");
+      setDescription("");
+      setPrice("");
+
+      // Refresh data so new artwork appears in lists.
+      router.refresh();
 
       // Simulate downstream steps for UX.
       setStep("Details Saved");
