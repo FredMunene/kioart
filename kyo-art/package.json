@@ -16,6 +16,7 @@
     "@coinbase/cdp-hooks": "0.0.68",
     "@coinbase/cdp-react": "0.0.68",
     "@coinbase/cdp-sdk": "^1.38.6",
+    "@story-protocol/core-sdk": "1.3.0-beta.2",
     "@supabase/supabase-js": "2.86.0",
     "buffer": "6.0.3",
     "clsx": "2.1.1",
